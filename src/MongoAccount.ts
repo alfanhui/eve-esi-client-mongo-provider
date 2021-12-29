@@ -7,7 +7,8 @@ import {
 import {
   modelOptions,
   prop,
-  DocumentType
+  DocumentType,
+  mongoose
 } from '@typegoose/typegoose'
 
 @modelOptions({ options: { customName: 'Account' } })
@@ -31,7 +32,7 @@ export default class MongoAccount implements Account {
   public async deleteCharacters (
     this: DocumentType<MongoAccount>
   ) {
-    const characters = await this.model('Character').find({
+    const characters = await mongoose.model('Character').find({
       owner: this.owner
     }).exec()
 

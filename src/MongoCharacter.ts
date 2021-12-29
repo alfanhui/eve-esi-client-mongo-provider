@@ -7,7 +7,8 @@ import {
 import {
   modelOptions,
   prop,
-  DocumentType
+  DocumentType,
+  mongoose
 } from '@typegoose/typegoose'
 
 @modelOptions({ options: { customName: 'Character' } })
@@ -58,7 +59,7 @@ export default class MongoCharacter implements Character {
   public async deleteTokens (
     this: DocumentType<MongoCharacter>
   ): Promise<void> {
-    await this.model('Token').deleteMany({
+    await mongoose.model('Token').deleteMany({
       characterId: this.characterId
     })
   }

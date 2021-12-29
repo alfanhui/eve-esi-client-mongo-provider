@@ -24,7 +24,6 @@ import {
 
 import {
   Connection,
-  ConnectionOptions,
   createConnection
 } from 'mongoose'
 
@@ -47,7 +46,7 @@ export default class MongoProvider<
   public constructor (
     uris: string,
     options: {
-      connectionOptions?: ConnectionOptions,
+      connectionOptions?: {},
       models?: {
         account?: AnyParamConstructor<any>,
         character?: AnyParamConstructor<any>,
@@ -57,28 +56,22 @@ export default class MongoProvider<
   ) {
     super()
 
-    createConnection(uris, options.connectionOptions).then(connection => {
-      this.#connection = connection
+    this.#connection = createConnection(uris, options.connectionOptions)
+    this.#accountModel = this.getModelForClass(
+      options.models?.account ?? MongoAccount
+    )
 
-      this.#accountModel = this.getModelForClass(
-        options.models?.account ?? MongoAccount
-      )
+    this.#characterModel = this.getModelForClass(
+      options.models?.character ?? MongoCharacter
+    )
 
-      this.#characterModel = this.getModelForClass(
-        options.models?.character ?? MongoCharacter
-      )
+    this.#tokenModel = this.getModelForClass(
+      options.models?.token ?? MongoToken
+    )
 
-      this.#tokenModel = this.getModelForClass(
-        options.models?.token ?? MongoToken
-      )
-
-      this.#ready = true
-      this.#connection.on('close', () => this.#ready = false)
-      this.emit('ready')
-    }).catch(err => {
-      this.#ready = false
-      this.emit('error', err)
-    })
+    this.#ready = true
+    this.#connection.on('close', () => this.#ready = false)
+    this.emit('ready')
   }
 
   public get connection () {
